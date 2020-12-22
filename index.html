@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <title>GitHub Pages Sample</title>
 <script src="libs/cannon.js"></script>
-<script src="libs/three.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r123/three.min.js"></script>
 <script src="libs/DeviceOrientationControls.js"></script>
 <!-- < src="index.js"></> -->
 </head>
@@ -64,7 +64,7 @@
             scene.fog = new THREE.Fog(0x000000, 1, 100);
             camera = new THREE.PerspectiveCamera(10, width / height, 1, 100);
             camera.position.set(Math.cos(Math.PI / 5) * 30, 5, Math.sin(Math.PI / 5) * 30);
-            camera.lookAt(new THREE.Vector3(0, 0, 0));
+            camera.lookAt(new THREE.Vector3(3, 1, 0));
             scene.add(camera);
 
             var controls = new THREE.DeviceOrientationControls( camera );
@@ -72,15 +72,14 @@
             var light = new THREE.DirectionalLight(0xffffff, 2);
             light.position.set(10, 10, -10);
             light.castShadow = true;
-            light.shadowMapWidth = 1024;
-            light.shadowMapHeight = 1024;
-            light.shadowCameraLeft = -10;
-            light.shadowCameraRight = 10;
-            light.shadowCameraTop = 10;
-            light.shadowCameraBottom = -10;
-            light.shadowCameraFar = 100;
-            light.shadowCameraNear = 0;
-            light.shadowDarkness = 0.5;
+            light.shadow.mapSize.width = 1024;
+            light.shadow.mapSize.height = 1024;
+            light.shadow.camera.left = -10;
+            light.shadow.camera.right = 10;
+            light.shadow.camera.top = 10;
+            light.shadow.camera.bottom = -10;
+            light.shadow.camera.far = 100;
+            light.shadow.camera.near = 0;
             scene.add(light);
             var amb   = new THREE.AmbientLight(0x999999);
             scene.add(amb);
@@ -103,10 +102,10 @@
             renderer = new THREE.WebGLRenderer({antialias: false});
             renderer.setSize(width, height);
             renderer.setClearColor(0x000000, 1);
-            renderer.devicePixelRatio = 1;
-            console.log(renderer)
-            renderer.shadowMapEnabled = true;
+            renderer.setPixelRatio(1);
+            renderer.shadowMap.enabled = true;
             document.body.appendChild(renderer.domElement);
+
             renderer.render(scene, camera);
 
             controls.update();
