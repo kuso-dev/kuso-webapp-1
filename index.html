@@ -5,7 +5,7 @@
 <title>GitHub Pages Sample</title>
 <script src="libs/cannon.js"></script>
 <script src="libs/three.js"></script>
-<!-- <script src="libs/DeviceOrientationControls.js"></script> -->
+<script src="libs/DeviceOrientationControls.js"></script>
 <!-- < src="index.js"></> -->
 </head>
 
@@ -62,12 +62,12 @@
         function setView() {
             scene = new THREE.Scene();
             scene.fog = new THREE.Fog(0x000000, 1, 100);
-            camera = new THREE.PerspectiveCamera(10, width / height, 1, 10000);
+            camera = new THREE.PerspectiveCamera(10, width / height, 1, 100);
             camera.position.set(Math.cos(Math.PI / 5) * 30, 5, Math.sin(Math.PI / 5) * 30);
             camera.lookAt(new THREE.Vector3(0, 0, 0));
             scene.add(camera);
 
-            //var controls = new THREE.DeviceOrientationControls( camera );
+            var controls = new THREE.DeviceOrientationControls( camera );
 
             var light = new THREE.DirectionalLight(0xffffff, 2);
             light.position.set(10, 10, -10);
@@ -100,14 +100,16 @@
             viewPlane.position.y = 1 / 2;
             viewPlane.receiveShadow = true;
             scene.add(viewPlane);
-            renderer = new THREE.WebGLRenderer({antialias: true});
+            renderer = new THREE.WebGLRenderer({antialias: false});
             renderer.setSize(width, height);
             renderer.setClearColor(0x000000, 1);
+            renderer.devicePixelRatio = 1;
+            console.log(renderer)
             renderer.shadowMapEnabled = true;
             document.body.appendChild(renderer.domElement);
             renderer.render(scene, camera);
 
-            //controls.update();
+            controls.update();
         }
 
         function animate() {
