@@ -1,8 +1,8 @@
 window.addEventListener('DOMContentLoaded', init);
 
 function init() {
-  const width = 960;
-  const height = 540;
+  const width = window.innerWidth;
+  const height = window.innerHeight;
 
   // レンダラーを作成
   const renderer = new THREE.WebGLRenderer({
@@ -17,6 +17,9 @@ function init() {
   // カメラを作成
   const camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
   camera.position.set(0, 0, +1000);
+
+  // コントローラを作成
+  const controls = new THREE.DeviceOrientationControls( camera );
 
   // 箱を作成
   const geometry = new THREE.BoxGeometry(500, 500, 500);
@@ -43,5 +46,7 @@ function init() {
 
     // レンダリング
     renderer.render(scene, camera);
+
+    controls.update()
   }
 }
