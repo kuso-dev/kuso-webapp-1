@@ -16,13 +16,13 @@ function init() {
 
   // カメラを作成
   const camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000);
-  camera.position.set(0, 0, +1000);
+  camera.position.set(0, 0, +100);
 
   // コントローラを作成
   const controls = new THREE.DeviceOrientationControls( camera );
 
   // 箱を作成
-  const geometry = new THREE.BoxGeometry(500, 500, 500);
+  const geometry = new THREE.BoxGeometry(50, 50, 50);
   const material = new THREE.MeshStandardMaterial({color: 0x0000FF});
   const box = new THREE.Mesh(geometry, material);
   scene.add(box);
@@ -47,6 +47,6 @@ function init() {
     // レンダリング
     renderer.render(scene, camera);
 
-    controls.update()
+    //controls.update()
   }
 }
