@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>sample01</title>
+        <meta charset="utf-8">
+    </head>
+    <body>
+        <style type="text/css">
+            body {
+                margin: 0;
+                padding: 0;
+            }
+        </style>
+        <script src="libs/cannon.js"></script>
+        <script src="libs/three.js"></script>
+        <script>
+
+            var world = null;
+            var phyPlane = null;
+            var phyBox = null;
+            var scene = null;
+            var camera = null;
+            var viewPlane = null;
+            var viewCube = null;
+            var renderer = null;
+
+            setPhy();
+            setView();
+            animate();
+
+            function setPhy() {
+                // 物理世界を生成
+                world = new CANNON.World();
+                // 重力を設定
+                world.gravity.set(0, -9.82, 0);
+                // ぶつかっている「可能性のある」剛体同士を見つける作業
+                world.broadphase = new CANNON.NaiveBroadphase();
+                // 反復計算回数
+                world.solver.iterations = 10;
+                // 許容値
+                world.solver.tolerance = 0.1;
+
+                // 地面用にPlaneの剛体を質量0で生成
+                phyPlane = new CANNON.Body({mass: 0});
+                phyPlane.addShape(new CANNON.Plane());
+                // X軸に90度に回転
+                phyPlane.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+                // 物理世界に追加
+                world.add(phyPlane);
+
+                // Boxのシェイプの剛体を質量1で生成
+                phyBox = new CANNON.Body({mass: 1});
+                phyBox.addShape(new CANNON.Box(new CANNON.Vec3(1, 1, 1)));
+                phyBox.position.y = 10;
+                // Z軸に10の角速度を設定
+                phyBox.angularVelocity.set(10, 10, 10);
+                // 減衰率
+                phyBox.angularDamping = 0.1;
+                // 物理世界に追加
+                world.add(phyBox);
+            }
+
+            function setView() {
+                scene = new THREE.Scene();
+                scene.fog = new THREE.Fog(0x000000, 1, 100);
+                camera = new THREE.PerspectiveCamera(30, 800 / 600, 1, 10000);
+                camera.position.set(Math.cos(Math.PI / 5) * 30, 5, Math.sin(Math.PI / 5) * 30);
+                camera.lookAt(new THREE.Vector3(0, 0, 0));
+                scene.add(camera);
+                var light = new THREE.DirectionalLight(0xffffff, 2);
+                light.position.set(10, 10, -10);
+                light.castShadow = true;
+                light.shadowMapWidth = 1024;
+                light.shadowMapHeight = 1024;
+                light.shadowCameraLeft = -10;
+                light.shadowCameraRight = 10;
+                light.shadowCameraTop = 10;
+                light.shadowCameraBottom = -10;
+                light.shadowCameraFar = 100;
+                light.shadowCameraNear = 0;
+                light.shadowDarkness = 0.5;
+                scene.add(light);
+                var amb   = new THREE.AmbientLight(0x999999);
+                scene.add(amb);
+                viewCube = new THREE.Mesh(new THREE.CubeGeometry(1, 1, 1, 10, 10), new THREE.MeshLambertMaterial({
+                    color: 0xffffff
+                }));
+                viewCube.castShadow = true;
+                viewCube.receiveShadow = true;
+                viewCube.position.y = 1;
+                scene.add(viewCube);
+                viewPlane = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.MeshPhongMaterial({
+                    color: 0x000000,
+                    specular: 0xffffff,
+                    shininess: 50
+                }));
+                viewPlane.rotation.x = -Math.PI / 2;
+                viewPlane.position.y = 1 / 2;
+                viewPlane.receiveShadow = true;
+                scene.add(viewPlane);
+                renderer = new THREE.WebGLRenderer({antialias: true});
+                renderer.setSize(800, 600);
+                renderer.setClearColor(0x000000, 1);
+                renderer.shadowMapEnabled = true;
+                document.body.appendChild(renderer.domElement);
+                renderer.render(scene, camera);
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                // 物理エンジンの時間を進める
+                world.step(1 / 60);
+                viewCube.position.copy(phyBox.position);
+                viewCube.quaternion.copy(phyBox.quaternion);
+                // レンダリング
+                renderer.render(scene, camera);
+            }
+
+        </script>
+    </body>
+</html>

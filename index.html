@@ -3,59 +3,124 @@
 <head>
 <meta charset="UTF-8">
 <title>GitHub Pages Sample</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r120/three.min.js"></script>
-<script src="./js/DeviceOrientationControls.js"></script>
+<script src="libs/cannon.js"></script>
+<script src="libs/three.js"></script>
+<script src="libs/DeviceOrientationControls.js"></script>
 <!-- < src="index.js"></> -->
 </head>
 
 <body>
     <script>
-        // シーンの作成
-        var scene = new THREE.Scene();
-        // カメラの作成
-        var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-        // レンダラーの作成（アンチエイリアス有効）
-        var renderer = new THREE.WebGLRenderer( {antialias: true} );
-        // レンダラーが描画するキャンバスサイズの設定
-        renderer.setSize( window.innerWidth, window.innerHeight );
-        // キャンバスをDOMツリーに追加
-        document.body.appendChild( renderer.domElement );
-        
-        // 環境光の作成
-        var light = new THREE.AmbientLight( 0xffffff );
-        // 環境光をシーンへ追加
-        scene.add( light );
-        
-        // DeviceOrientationControlsインスタンス作成
-        var controls = new THREE.DeviceOrientationControls( camera );
-        
-        // 球体の作成
-        var geometry = new THREE.SphereGeometry( 5, 32, 16 );
-        // テクスチャを球体の裏側にマップする
-        geometry.scale( - 1, 1, 1 );
-        
-        // テクスチャ画像の読み込み
-        var texture = new THREE.TextureLoader().load( './img/360.jpg' );
-        // マテリアルの作成
-        var material = new THREE.MeshPhongMaterial( { map: texture, color: 0xffffff } );
-        
-        // オブジェクトの作成
-        var mesh = new THREE.Mesh( geometry, material );
-        // オブジェクトをy軸に沿って回転
-        mesh.rotation.y = Math.PI/2;
-        // オブジェクトをシーンに追加
-        scene.add( mesh );
-        
-        function render(){
-            requestAnimationFrame( render );
-        
-            // レンダリング
-            renderer.render(scene,camera);
-        
-            controls.update();
+        const width = window.innerWidth;
+        const height = window.innerHeight;
+
+        var world = null;
+        var phyPlane = null;
+        var phyBox = null;
+        var scene = null;
+        var camera = null;
+        var viewPlane = null;
+        var viewCube = null;
+        var renderer = null;
+
+        setPhy();
+        setView();
+        animate();
+
+        function setPhy() {
+            // 物理世界を生成
+            world = new CANNON.World();
+            // 重力を設定
+            world.gravity.set(0, -9.82, 0);
+            // ぶつかっている「可能性のある」剛体同士を見つける作業
+            world.broadphase = new CANNON.NaiveBroadphase();
+            // 反復計算回数
+            world.solver.iterations = 10;
+            // 許容値
+            world.solver.tolerance = 0.1;
+
+            // 地面用にPlaneの剛体を質量0で生成
+            phyPlane = new CANNON.Body({mass: 0});
+            phyPlane.addShape(new CANNON.Plane());
+            // X軸に90度に回転
+            phyPlane.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2);
+            // 物理世界に追加
+            world.add(phyPlane);
+
+            // Boxのシェイプの剛体を質量1で生成
+            phyBox = new CANNON.Body({mass: 1});
+            phyBox.addShape(new CANNON.Box(new CANNON.Vec3(1, 1, 1)));
+            phyBox.position.y = 10;
+            // Z軸に10の角速度を設定
+            phyBox.angularVelocity.set(10, 10, 10);
+            // 減衰率
+            phyBox.angularDamping = 0.1;
+            // 物理世界に追加
+            world.add(phyBox);
         }
-        render();
-        </script>
+
+        function setView() {
+            scene = new THREE.Scene();
+            scene.fog = new THREE.Fog(0x000000, 1, 100);
+            camera = new THREE.PerspectiveCamera(10, width / height, 1, 10000);
+            camera.position.set(Math.cos(Math.PI / 5) * 30, 5, Math.sin(Math.PI / 5) * 30);
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+            scene.add(camera);
+
+            //var controls = new THREE.DeviceOrientationControls( camera );
+
+            var light = new THREE.DirectionalLight(0xffffff, 2);
+            light.position.set(10, 10, -10);
+            light.castShadow = true;
+            light.shadowMapWidth = 1024;
+            light.shadowMapHeight = 1024;
+            light.shadowCameraLeft = -10;
+            light.shadowCameraRight = 10;
+            light.shadowCameraTop = 10;
+            light.shadowCameraBottom = -10;
+            light.shadowCameraFar = 100;
+            light.shadowCameraNear = 0;
+            light.shadowDarkness = 0.5;
+            scene.add(light);
+            var amb   = new THREE.AmbientLight(0x999999);
+            scene.add(amb);
+            viewCube = new THREE.Mesh(new THREE.CubeGeometry(1, 1, 1, 10, 10), new THREE.MeshLambertMaterial({
+                color: 0xffffff
+            }));
+            viewCube.castShadow = true;
+            viewCube.receiveShadow = true;
+            viewCube.position.y = 1;
+            scene.add(viewCube);
+            viewPlane = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.MeshPhongMaterial({
+                color: 0x000000,
+                specular: 0xffffff,
+                shininess: 50
+            }));
+            viewPlane.rotation.x = -Math.PI / 2;
+            viewPlane.position.y = 1 / 2;
+            viewPlane.receiveShadow = true;
+            scene.add(viewPlane);
+            renderer = new THREE.WebGLRenderer({antialias: true});
+            renderer.setSize(width, height);
+            renderer.setClearColor(0x000000, 1);
+            renderer.shadowMapEnabled = true;
+            document.body.appendChild(renderer.domElement);
+            renderer.render(scene, camera);
+
+            //controls.update();
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            // 物理エンジンの時間を進める
+            world.step(1 / 60);
+            viewCube.position.copy(phyBox.position);
+            viewCube.quaternion.copy(phyBox.quaternion);
+            // レンダリング
+            renderer.render(scene, camera);
+        }
+
+    </script>
 <canvas id="myCanvas"></canvas>
 </body>
 </html>
