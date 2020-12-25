@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>GitHub Pages Sample</title>
+<div id="txt">ここにデータを表示</div> 
 <!-- Cannon.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
 <!-- Three.js -->
@@ -13,7 +14,34 @@
 
 <body>
 <script>
-    const state = {}
+
+var alpha = 0, beta = 0, gamma = 0;             // ジャイロの値を入れる変数を3個用意
+ 
+// ジャイロセンサの値が変化したら実行される deviceorientation イベント
+window.addEventListener("deviceorientation", (dat) => {
+    alpha = dat.alpha;  // z軸（表裏）まわりの回転の角度（反時計回りがプラス）
+    beta  = dat.beta;   // x軸（左右）まわりの回転の角度（引き起こすとプラス）
+    gamma = dat.gamma;  // y軸（上下）まわりの回転の角度（右に傾けるとプラス）
+});
+ 
+// 指定時間ごとに繰り返し実行される setInterval(実行する内容, 間隔[ms]) タイマーを設定
+var timer = window.setInterval(() => {
+    displayData();      // displayData 関数を実行
+}, 33); // 33msごとに（1秒間に約30回）
+ 
+// データを表示する displayData 関数
+function displayData() {
+    var txt = document.getElementById("txt");   // データを表示するdiv要素の取得
+    txt.innerHTML = "alpha: " + alpha + "<br>"  // x軸の値
+                  + "beta:  " + beta  + "<br>"  // y軸の値
+                  + "gamma: " + gamma;          // z軸の値
+
+    console.log(state.boxes[0])
+    //加速度を与える
+    state.boxes[0].body.force.z = (beta) / 5
+    state.boxes[0].body.force.x = (gamma) / 10
+}
+const state = {}
 
 let lastTime
 const fixedTimeStep = 1.0 / 60.0 // seconds
@@ -64,9 +92,6 @@ function init() {
 
   // controls ------------------------------
   controls = state.controls = new THREE.DeviceOrientationControls(camera)
-  controls.maxDistance = 5000.0
-  controls.autoRotate = false
-  controls.autoRotateSpeed = 1.0
 
   renderer = state.renderer = new THREE.WebGLRenderer()
   renderer.setSize(window.innerWidth, window.innerHeight)
@@ -81,12 +106,13 @@ function init() {
   // X軸が赤色、Y軸が緑色、Z軸が青色
 }
 
-function Ground(size = 1000) {
+function Ground(size = 1) {
   // cannon
   const body = new CANNON.Body({
-    mass: 0 // mass == 0 makes the body static
+    mass: 0, // mass == 0 makes the body static
   })
-  body.addShape(new CANNON.Plane())
+  //body.addShape(new CANNON.Plane())
+  body.addShape(new CANNON.Box(new CANNON.Vec3(1, 1, 0.001)))
   //
   body.quaternion.setFromAxisAngle(new CANNON.Vec3(1, 0, 0), -Math.PI / 2)
   // three
