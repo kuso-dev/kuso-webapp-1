@@ -90,6 +90,11 @@ function init() {
   const direction = new THREE.DirectionalLight(0xffffff, 1)
   scene.add(direction)
 
+  // background
+  const loader = new THREE.TextureLoader();
+  const texture = loader.load('img/uyu.jpg');
+  scene.background = texture
+
   // controls ------------------------------
   controls = state.controls = new THREE.DeviceOrientationControls(camera)
 
@@ -99,10 +104,10 @@ function init() {
   document.body.appendChild(renderer.domElement)
 
   // helper
-  const gridHelper = new THREE.GridHelper(1000, 120) // size, step
-  scene.add(gridHelper)
-  const axisHelper = new THREE.AxisHelper(1000, 50)
-  scene.add(axisHelper)
+//   const gridHelper = new THREE.GridHelper(1000, 120) // size, step
+//   scene.add(gridHelper)
+//   const axisHelper = new THREE.AxisHelper(1000, 50)
+//   scene.add(axisHelper)
   // X軸が赤色、Y軸が緑色、Z軸が青色
 }
 
@@ -110,6 +115,7 @@ function Ground(size = 1) {
   // cannon
   const body = new CANNON.Body({
     mass: 0, // mass == 0 makes the body static
+    material: new CANNON.Material( { friction: 0, } )
   })
   //body.addShape(new CANNON.Plane())
   body.addShape(new CANNON.Box(new CANNON.Vec3(1, 1, 0.001)))
@@ -167,9 +173,11 @@ function Sphere(props) {
   var body = new CANNON.Body({
     mass, // kg
     position: new CANNON.Vec3(point.x, point.y, point.z), // m
-    shape: new CANNON.Sphere(weight)
+    shape: new CANNON.Sphere(weight),
+    material: new CANNON.Material( { friction: 0.1 } )
   })
   // mesh
+  
   const geometry = new THREE.CylinderGeometry(0.5, 0.75, 0.75)
 
 
