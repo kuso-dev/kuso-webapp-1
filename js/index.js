@@ -1,6 +1,6 @@
 window.addEventListener("DOMContentLoaded", () => {
   init();
-  permission_request()
+  permission_request();
 });
 
 window.addEventListener("start", () => {
@@ -52,15 +52,15 @@ function permission_request() {
     DeviceOrientationEvent.requestPermission &&
     typeof DeviceOrientationEvent.requestPermission === "function"
   ) {
-    DeviceOrientationEvent.requestPermission().then(res => {
-      if (res == 'granted') {
+    DeviceOrientationEvent.requestPermission().then((res) => {
+      if (res == "granted") {
         window.addEventListener("deviceorientation", (dat) => {
           alpha = dat.alpha; // z軸（表裏）まわりの回転の角度（反時計回りがプラス）
           beta = dat.beta; // x軸（左右）まわりの回転の角度（引き起こすとプラス）
           gamma = dat.gamma; // y軸（上下）まわりの回転の角度（右に傾けるとプラス）
         });
       }
-    })
+    });
   }
 }
 
@@ -69,7 +69,7 @@ function orientationDecisionHandler() {
     window.clearInterval(timer);
     document.getElementById("score-overlay").style.zIndex = 1;
     var score = document.getElementById("score");
-    score.innerHTML = "TTL:" + time + "ms";
+    score.innerHTML = "TTL:" + time + "ms" + (isPMD ? " (PMD)" : "");
   }
   //加速度を与える
   if (isPMD) {
