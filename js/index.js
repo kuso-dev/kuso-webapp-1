@@ -5,9 +5,14 @@ window.addEventListener('DOMContentLoaded', () => {
 window.addEventListener('start', () => {
   render()
   animate(1)
+  window.setInterval(() => {
+    time++
+    var txt = document.getElementById("txt");   // データを表示するdiv要素の取得
+    txt.innerHTML = "SCORE" + time;
+}, 33);
 });
 
-var alpha = 0, beta = 0, gamma = 0;             // ジャイロの値を入れる変数を3個用意
+var alpha = 0, beta = 0, gamma = 0, time = 0;             // ジャイロの値を入れる変数を3個用意
  
 // ジャイロセンサの値が変化したら実行される deviceorientation イベント
 window.addEventListener("deviceorientation", (dat) => {
@@ -23,11 +28,6 @@ var timer = window.setInterval(() => {
  
 // データを表示する displayData 関数
 function displayData() {
-    var txt = document.getElementById("txt");   // データを表示するdiv要素の取得
-    txt.innerHTML = "alpha: " + alpha + "<br>"  // x軸の値
-                  + "beta:  " + beta  + "<br>"  // y軸の値
-                  + "gamma: " + gamma;          // z軸の値
-
     //console.log(state.boxes[0])
 
     if (state.boxes[0].mesh.position.y < -1) {

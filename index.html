@@ -3,7 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <link rel="stylesheet" href="style/index.css">
-<title>GitHub Pages Sample</title>
+<!-- Google Fonts -->
+<link  rel="stylesheet" href="https://fonts.googleapis.com/css?family=Bangers">
+<title>ExtremePuddingCarrier</title>
 <!-- Cannon.js -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/cannon.js/0.6.2/cannon.min.js"></script>
 <!-- Three.js -->
@@ -12,7 +14,7 @@
 <script src="js/index.js"></script>
 <script>
     function start() {
-        t = document.getElementById('title')
+        t = document.getElementById('title-overlay')
         t.remove()
         const event = new CustomEvent('start');
         window.dispatchEvent(event)
@@ -20,8 +22,16 @@
 </script>
 </head>
 <body>
-    <div id="title">
-        <button onclick="start()">始まるよ</button>
+    <div id="title-overlay">
+        <p id="title-text">
+            Extreme<br>
+            Pudding<br>
+            Carrier
+        </p>
+        <div id="buttons">
+            <button onclick="start()">🚬&nbsp;&nbsp;EASY</button>
+            <button onclick="start()">🍮&nbsp;&nbsp;PUDDING MUST DIE</button>
+        </div>
     </div>
     <div id="txt" class="hoge">ここにデータを表示</div>
 </body>

@@ -1,4 +1,4 @@
-#title {
+#title-overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -8,6 +8,37 @@
     background-color: rgba(0, 0, 0, 0.8);
 }
 
-#txt {
-    background-color: red;
+#title-overlay #title-text {
+    margin-top: 30px;
+    text-align: center;
+    color: white;
+    font-size: 10em;
+    font-family: 'Bangers';
+    /* transform: rotateZ(45deg); */
+}
+
+#title-overlay p {
+    margin-top: 30px;
+    padding: 12px;
+    text-align: center;
+    color: white;
+    font-size: 40px;
+}
+
+#title-overlay #buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+#buttons button {
+    display: inline-block;
+    margin: 12px;
+    padding: 0.5em 1em;
+    font-size: 3em;
+    text-decoration: none;
+    background: #668ad8;
+    color: #FFF;
+    border-bottom: solid 4px #627295;
+    border-radius: 3px;
 }
