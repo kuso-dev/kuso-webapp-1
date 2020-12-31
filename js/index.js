@@ -9,6 +9,7 @@ window.addEventListener('start', () => {
     time++
     var txt = document.getElementById("txt");   // データを表示するdiv要素の取得
     txt.innerHTML = "SCORE" + time;
+    console.log(isPMD);
 }, 33);
 });
 
@@ -34,8 +35,13 @@ function displayData() {
       location.reload()
     }
     //加速度を与える
-    state.boxes[0].body.force.z = (beta) / 1.5
-    state.boxes[0].body.force.x = (gamma) / 3
+    if (isPMD) {
+      state.boxes[0].body.force.z = (beta)
+      state.boxes[0].body.force.x = (gamma)
+    } else {
+      state.boxes[0].body.force.z = (beta) / 1.5
+      state.boxes[0].body.force.x = (gamma) / 3
+    }
 }
 const state = {}
 
