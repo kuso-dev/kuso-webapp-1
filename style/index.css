@@ -53,6 +53,7 @@
 #score {
     text-align: center;
     color: white;
+    font-family: 'Bangers';
     font-size: 3em;
 }
 
@@ -65,6 +66,7 @@ button {
     display: inline-block;
     margin: 12px;
     padding: 0.5em 1em;
+    font-family: 'Bangers';
     font-size: 3em;
     text-decoration: none;
     background: #668ad8;

@@ -69,9 +69,8 @@ function orientationDecisionHandler() {
     window.clearInterval(timer);
     document.getElementById("score-overlay").style.zIndex = 1;
     var score = document.getElementById("score");
-    score.innerHTML = "TTL:" + time + "ms" + (isPMD ? " (PMD)" : "");
+    score.innerHTML = "SCORE :" + time + "ms" + (isPMD ? " (PMD)" : "");
   }
-  //加速度を与える
   if (isPMD) {
     state.boxes[0].body.force.z = beta * 2;
     state.boxes[0].body.force.x = gamma * 3;
