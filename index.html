@@ -24,7 +24,6 @@
 </head>
 <body>
     <div id="title-overlay" class="overlay">
-        <button onclick="permission_request()">このエリアを押して モーションの利用を許可してください (iOS 13+) </button>
         <p id="title-text">
             Extreme<br>
             Pudding<br>
@@ -33,6 +32,7 @@
         <div id="buttons">
             <button class="btn" onclick="start()">🚬&nbsp;&nbsp;EASY</button>
             <button onclick="start(); isPMD = true">🍮&nbsp;&nbsp;PUDDING MUST DIE</button>
+            <button onclick="permission_request()">iOS Permission</button>
         </div>
     </div>
     <div id="score-overlay" class="overlay">
