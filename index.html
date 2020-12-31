@@ -15,25 +15,33 @@
 <script>
     var isPMD = false;
     function start() {
-        t = document.getElementById('title-overlay')
-        t.remove()
+        titleOverlay = document.getElementById('title-overlay')
+        titleOverlay.remove()
         const event = new CustomEvent('start');
         window.dispatchEvent(event)
     }
 </script>
 </head>
 <body>
-    <div id="title-overlay">
+    <div id="title-overlay" class="overlay">
         <p id="title-text">
             Extreme<br>
             Pudding<br>
             Carrier
         </p>
         <div id="buttons">
-            <button onclick="start()">🚬&nbsp;&nbsp;EASY</button>
+            <button class="btn" onclick="start()">🚬&nbsp;&nbsp;EASY</button>
             <button onclick="start(); isPMD = true">🍮&nbsp;&nbsp;PUDDING MUST DIE</button>
         </div>
     </div>
-    <div id="txt" class="hoge">ここにデータを表示</div>
+    <div id="score-overlay" class="overlay">
+        <p id="title-text">
+            Pudding is DEAD
+        </p>
+        <p id="score">ttl</p>
+        <div>
+            <button id="home-button" onclick="window.location.reload();">RETRY</button>
+        </div>
+    </div>
 </body>
 </html>

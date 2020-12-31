@@ -1,11 +1,18 @@
-#title-overlay {
+.overlay {
     position: absolute;
     top: 0;
     left: 0;
     height: 100%;
     width: 100%;
-    z-index: 10;
     background-color: rgba(0, 0, 0, 0.8);
+}
+
+#title-overlay {
+    z-index: 1;
+}
+
+#score-overlay {
+    z-index: -1;
 }
 
 #title-overlay #title-text {
@@ -14,7 +21,6 @@
     color: white;
     font-size: 10em;
     font-family: 'Bangers';
-    /* transform: rotateZ(45deg); */
 }
 
 #title-overlay p {
@@ -31,7 +37,31 @@
     justify-content: center;
 }
 
-#buttons button {
+#score-overlay div {
+    position: relative;
+    text-align: center;
+}
+
+#score-overlay #title-text {
+    margin-top: 20vh;
+    text-align: center;
+    color: red;
+    font-size: 5em;
+    font-family: 'Bangers';
+}
+
+#score {
+    text-align: center;
+    color: white;
+    font-size: 3em;
+}
+
+#home-button {
+    bottom: 0;
+    margin: 0 auto;
+}
+
+button {
     display: inline-block;
     margin: 12px;
     padding: 0.5em 1em;
