@@ -36,8 +36,8 @@ function displayData() {
     }
     //加速度を与える
     if (isPMD) {
-      state.boxes[0].body.force.z = (beta)
-      state.boxes[0].body.force.x = (gamma)
+      state.boxes[0].body.force.z = (beta) * 2
+      state.boxes[0].body.force.x = (gamma) * 3
     } else {
       state.boxes[0].body.force.z = (beta) / 1.5
       state.boxes[0].body.force.x = (gamma) / 3
