@@ -98,6 +98,12 @@ function init() {
   bgm.src = "src/sound.mp3";
   bgm.load();
 
+  // BGMアラート
+  if (!localStorage.getItem("alert")) {
+    alert("BGMが流れます");
+    localStorage.setItem("alert", true);
+  }
+
   state.controls = new THREE.DeviceOrientationControls(state.camera);
 
   state.renderer = new THREE.WebGLRenderer();
