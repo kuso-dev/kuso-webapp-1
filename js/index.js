@@ -28,23 +28,21 @@ const PROPS = () => ({
   limit: 2,
   width: 100,
   height: 100,
-  floorColor: "#ffffff",
+  floorColor: 0xffffff
 });
 
-const fixedTimeStep = 1.0 / 60.0; // seconds
+const fixedTimeStep = 1.0 / 60.0;
 const maxSubSteps = 10;
 const state = {};
 
-var alpha = 0,
-  beta = 0,
-  gamma = 0,
-  time = 0,
-  lastTime,
-  timer;
-
-var timer = window.setInterval(() => {
-  orientationDecisionHandler();
-}, 33);
+var isPMD = false;
+var alpha = 0;
+var beta = 0;
+var gamma = 0;
+var time = 0;
+var lastTime;
+var timer;
+var orientationHandler;
 
 function permission_request() {
   if (
@@ -66,10 +64,7 @@ function permission_request() {
 
 function orientationDecisionHandler() {
   if (state.boxes[0].mesh.position.y < -1) {
-    window.clearInterval(timer);
-    document.getElementById("score-overlay").style.zIndex = 1;
-    var score = document.getElementById("score");
-    score.innerHTML = "SCORE :" + time + "ms" + (isPMD ? " (PMD)" : "");
+    endGame();
   }
   if (isPMD) {
     state.boxes[0].body.force.z = beta * 2;
@@ -81,40 +76,43 @@ function orientationDecisionHandler() {
 }
 
 function init() {
-  world = state.world = new CANNON.World();
-  world.gravity.set(0, -9.82, 0); // m/s²
+  state.world = new CANNON.World();
+  state.world.gravity.set(0, -9.82, 0);
 
-  scene = state.sence = new THREE.Scene();
-  camera = state.camera = new THREE.PerspectiveCamera(
+  state.sence = new THREE.Scene();
+  state.camera = new THREE.PerspectiveCamera(
     75,
     window.innerWidth / window.innerHeight,
     1,
     1000
   );
-  camera.position.set(0, 1, 3);
+  state.camera.position.set(0, 1, 3);
 
   generate();
 
   const ambient = new THREE.AmbientLight(0xffffff, 1.0);
-  scene.add(ambient);
+  state.sence.add(ambient);
   const direction = new THREE.DirectionalLight(0xffffff, 1);
-  scene.add(direction);
+  state.sence.add(direction);
 
   const loader = new THREE.TextureLoader();
   const texture = loader.load("img/uyu.jpg");
-  scene.background = texture;
+  state.sence.background = texture;
 
-  controls = state.controls = new THREE.DeviceOrientationControls(camera);
+  state.controls = new THREE.DeviceOrientationControls(state.camera);
 
-  renderer = state.renderer = new THREE.WebGLRenderer();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  document.body.appendChild(renderer.domElement);
+  state.renderer = new THREE.WebGLRenderer();
+  state.renderer.setSize(window.innerWidth, window.innerHeight);
+  document.body.appendChild(state.renderer.domElement);
 }
 
 /**
- * 皿作る
- * @return {body, mesh} ThreejsのmeshとCannon.jsのbodyを返す
- */
+ * 皿
+ * @return {
+  * body: CANNON.Body,
+  * mesh: THREE.Mesh
+  * }
+  */
 function Dish(size = 1) {
   const body = new CANNON.Body({
     mass: 0,
@@ -138,15 +136,18 @@ function Dish(size = 1) {
 }
 
 /**
- * プリン作る
- * @return {body, mesh} ThreejsのmeshとCannon.jsのbodyを返す
+ * プリン
+ * @return {
+ * body: CANNON.Body,
+ * mesh: THREE.Mesh
+ * }
  */
-function Sphere(props) {
+function Pudding(props) {
   const { point, weight, mass = 5, color = 0xaa0000 } = props;
 
   var radius = 1;
   var body = new CANNON.Body({
-    mass, // kg
+    mass,
     position: new CANNON.Vec3(point.x, point.y, point.z),
     shape: new CANNON.Sphere(weight),
     material: new CANNON.Material({
@@ -154,7 +155,7 @@ function Sphere(props) {
     }),
   });
 
-  const geometry = new THREE.CylinderGeometry(0.5, 0.75, 0.75);
+  const geometry = new THREE.CylinderGeometry(radius * 0.5, radius * 0.75, radius * 0.75);
 
   const puddingMaterial = new THREE.MeshStandardMaterial({
     color,
@@ -182,10 +183,9 @@ function Sphere(props) {
 }
 
 function generate(props = {}) {
-  // 床
-  const dish = (state.dish = new Dish(1));
-  scene.add(dish.mesh);
-  world.addBody(dish.body);
+  const dish = new Dish(1);
+  state.sence.add(dish.mesh);
+  state.world.addBody(dish.body);
   const weight = PROPS().initWeight;
   state.boxes = [];
 
@@ -195,15 +195,33 @@ function generate(props = {}) {
     z: 0,
   };
 
-  state.boxes[0] = new Sphere({
+  state.boxes[0] = new Pudding({
     point: boxPosition,
     weight: weight / 2,
     mass: 5,
     color: 0xffca5c,
   });
 
-  scene.add(state.boxes[0].mesh);
-  world.addBody(state.boxes[0].body);
+  state.sence.add(state.boxes[0].mesh);
+  state.world.addBody(state.boxes[0].body);
+}
+
+function startGame() {
+  permission_request();
+  orientationHandler = window.setInterval(() => {
+    orientationDecisionHandler();
+  }, 33);
+  titleOverlay = document.getElementById("title-overlay");
+  titleOverlay.remove();
+  const event = new CustomEvent("start");
+  window.dispatchEvent(event);
+}
+
+function endGame() {
+  window.clearInterval(timer);
+  document.getElementById("score-overlay").style.zIndex = 1;
+  var score = document.getElementById("score");
+  score.innerHTML = "SCORE :" + time + "ms" + (isPMD ? " (PMD)" : "");
 }
 
 function animate(time) {
@@ -211,7 +229,7 @@ function animate(time) {
   const { boxes } = state;
   if (lastTime !== undefined) {
     var dt = (time - lastTime) / 1000;
-    world.step(fixedTimeStep, dt, maxSubSteps);
+    state.world.step(fixedTimeStep, dt, maxSubSteps);
   }
   for (let i = 0; i < PROPS().amount; i++) {
     const { mesh, body } = boxes[i];
@@ -223,5 +241,5 @@ function animate(time) {
 }
 
 function render() {
-  renderer.render(scene, camera);
+  state.renderer.render(state.sence, state.camera);
 }

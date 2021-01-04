@@ -12,16 +12,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r123/three.min.js"></script>
 <script src="libs/DeviceOrientationControls.js"></script>
 <script src="js/index.js"></script>
-<script>
-    var isPMD = false;
-    function start() {
-        permission_request()
-        titleOverlay = document.getElementById('title-overlay')
-        titleOverlay.remove()
-        const event = new CustomEvent('start');
-        window.dispatchEvent(event)
-    }
-</script>
 </head>
 <body>
     <div id="title-overlay" class="overlay">
@@ -31,9 +21,8 @@
             Carrier
         </p>
         <div id="buttons">
-            <button class="btn" onclick="start()">🚬&nbsp;&nbsp;EASY</button>
-            <button onclick="start(); isPMD = true">🍮&nbsp;&nbsp;PUDDING MUST DIE</button>
-            <button onclick="permission_request()">iOS Permission</button>
+            <button class="btn" onclick="startGame()">🚬&nbsp;&nbsp;EASY</button>
+            <button onclick="startGame(); isPMD = true">🍮&nbsp;&nbsp;PUDDING MUST DIE</button>
         </div>
     </div>
     <div id="score-overlay" class="overlay">
