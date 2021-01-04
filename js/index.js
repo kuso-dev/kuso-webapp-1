@@ -18,17 +18,9 @@ window.addEventListener("deviceorientation", (dat) => {
   gamma = dat.gamma; // y軸（上下）まわりの回転の角度（右に傾けるとプラス）
 });
 
-// 定数はPROPSで管理する。 PROPS().valueName で取得
 const PROPS = () => ({
-  initPoint: { x: 0, y: 0, z: 0 },
-  amount: 1,
   initWeight: 1,
-  initMass: 2,
-  margin: 20,
-  limit: 2,
-  width: 100,
-  height: 100,
-  floorColor: 0xffffff
+  floorColor: 0xffffff,
 });
 
 const fixedTimeStep = 1.0 / 60.0;
@@ -109,10 +101,10 @@ function init() {
 /**
  * 皿
  * @return {
-  * body: CANNON.Body,
-  * mesh: THREE.Mesh
-  * }
-  */
+ * body: CANNON.Body,
+ * mesh: THREE.Mesh
+ * }
+ */
 function Dish(size = 1) {
   const body = new CANNON.Body({
     mass: 0,
@@ -155,7 +147,11 @@ function Pudding(props) {
     }),
   });
 
-  const geometry = new THREE.CylinderGeometry(radius * 0.5, radius * 0.75, radius * 0.75);
+  const geometry = new THREE.CylinderGeometry(
+    radius * 0.5,
+    radius * 0.75,
+    radius * 0.75
+  );
 
   const puddingMaterial = new THREE.MeshStandardMaterial({
     color,
@@ -231,11 +227,9 @@ function animate(time) {
     var dt = (time - lastTime) / 1000;
     state.world.step(fixedTimeStep, dt, maxSubSteps);
   }
-  for (let i = 0; i < PROPS().amount; i++) {
-    const { mesh, body } = boxes[i];
-    mesh.position.copy(body.position);
-    mesh.quaternion.copy(body.quaternion);
-  }
+  const { mesh, body } = boxes[0];
+  mesh.position.copy(body.position);
+  mesh.quaternion.copy(body.quaternion);
   lastTime = time;
   render();
 }
