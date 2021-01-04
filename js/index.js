@@ -26,6 +26,7 @@ const PROPS = () => ({
 const fixedTimeStep = 1.0 / 60.0;
 const maxSubSteps = 10;
 const state = {};
+const bgm = new Audio();
 
 var isPMD = false;
 var alpha = 0;
@@ -87,9 +88,15 @@ function init() {
   const direction = new THREE.DirectionalLight(0xffffff, 1);
   state.sence.add(direction);
 
+  // 背景
   const loader = new THREE.TextureLoader();
-  const texture = loader.load("img/uyu.jpg");
+  const texture = loader.load("src/img/uyu.jpg");
   state.sence.background = texture;
+
+  // BGMロード
+  bgm.preload = "auto";
+  bgm.src = "src/sound.mp3";
+  bgm.load();
 
   state.controls = new THREE.DeviceOrientationControls(state.camera);
 
@@ -211,6 +218,11 @@ function startGame() {
   titleOverlay.remove();
   const event = new CustomEvent("start");
   window.dispatchEvent(event);
+
+  // BGM再生
+  bgm.currentTime = 0;
+  bgm.loop = true;
+  bgm.play();
 }
 
 function endGame() {
